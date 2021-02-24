@@ -7,13 +7,30 @@ import {
   TouchableOpacity
 } from 'react-native'
 
-export default function CreateChatRoom() {
+import firestore from '@react-native-firebase/firestore'
+
+
+export default function CreateChatRoom({navigation}) {
   const [roomName, setRoomName] = useState('')
 
   function handleButtonPress() {
+    
     if (roomName.length > 0) {
       // create new thread using firebase
+      firestore()
+        .collection('MESSAGE_THREADS')
+        .add({
+          name:roomName,
+          latestMessage: {
+            text: `${roomName} created. Welcome!`,
+            createdAt: new Date().getTime()
+          }
+        })
+        .then(()=> {
+          navigation.navigate('ChatRoom')
+        })
     }
+    return null
   }
 
   return (
@@ -23,7 +40,7 @@ export default function CreateChatRoom() {
         placeholder='Thread Name'
         onChangeText={roomName => setRoomName(roomName)}
       />
-      <TouchableOpacity style={styles.button} onPress={handleButtonPress}>
+      <TouchableOpacity style={styles.button} onPress={() => handleButtonPress()}>
         <Text style={styles.buttonText}>Create chat room</Text>
       </TouchableOpacity>
     </View>
