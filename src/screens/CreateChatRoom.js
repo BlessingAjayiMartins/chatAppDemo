@@ -10,11 +10,12 @@ import {
 import firestore from '@react-native-firebase/firestore'
 
 
-export default function CreateChatRoom({navigation}) {
+const CreateChatRoom = ({navigation}) => {
   const [roomName, setRoomName] = useState('')
 
-  function handleButtonPress() {
-    
+  const handleButtonPress = () => {
+    const mill = new Date().getTime()
+    const date = new Date(mill)
     if (roomName.length > 0) {
       // create new thread using firebase
       firestore()
@@ -23,10 +24,15 @@ export default function CreateChatRoom({navigation}) {
           name:roomName,
           latestMessage: {
             text: `${roomName} created. Welcome!`,
-            createdAt: new Date().getTime()
+            createdAt: date.toLocaleString()
           }
         })
-        .then(()=> {
+        .then(docRef => {
+          docRef.collection('MESSAGES').add({
+            text: `${roomName} created. Welcome!`,
+            createdAt: date.toLocaleString(),
+            system: true
+          })
           navigation.navigate('ChatRoom')
         })
     }
@@ -47,6 +53,7 @@ export default function CreateChatRoom({navigation}) {
   )
 }
 
+export default CreateChatRoom
 const styles = StyleSheet.create({
   container: {
     flex: 1,
